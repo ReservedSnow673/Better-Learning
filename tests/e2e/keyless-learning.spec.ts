@@ -25,6 +25,7 @@ test('a saved lesson note appears in the notebook', async ({ page }) => {
   await page.getByRole('tab', { name: 'Notes' }).click()
   await page.getByLabel('Private note').fill('Attention returns through practice.')
   await page.getByRole('button', { name: 'Save note' }).click()
+  await expect(page.getByRole('button', { name: 'Saved on this device' })).toBeVisible()
   await page.goto('/notebook')
   await expect(page.getByText('Attention returns through practice.')).toBeVisible()
 })
