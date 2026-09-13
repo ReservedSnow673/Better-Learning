@@ -7,7 +7,7 @@ vi.mock('@fal-ai/client', () => ({
 }))
 
 import { db } from '../lib/db'
-import { cacheMediaAsset, createAvatarJob, createCaptionJob, createNarrationJob, pollMediaJob, splitScriptIntoScenes } from '../lib/media'
+import { createAvatarJob, createCaptionJob, createNarrationJob, pollMediaJob, splitScriptIntoScenes } from '../lib/media'
 
 describe('media generation and recovery', () => {
   beforeEach(async () => {
@@ -15,7 +15,7 @@ describe('media generation and recovery', () => {
     falMocks.submit.mockReset().mockResolvedValue({ request_id: 'provider-job-1' })
     falMocks.status.mockReset().mockResolvedValue({ status: 'COMPLETED' })
     falMocks.result.mockReset().mockResolvedValue({ data: { audio: { url: 'https://fal.media/narration.wav', content_type: 'audio/wav' } } })
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('media', { status: 200, headers: { 'content-type': 'audio/wav' } }))
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response('media', { status: 200, headers: { 'content-type': 'audio/wav' } }))
   })
   afterEach(async () => { vi.restoreAllMocks(); await db.delete() })
 
@@ -36,8 +36,9 @@ describe('media generation and recovery', () => {
 
     const complete = await pollMediaJob('fal-key', first)
     expect(complete).toMatchObject({ status: 'complete', outputUrl: 'https://fal.media/narration.wav' })
-    await cacheMediaAsset(complete)
-    expect(await db.mediaAssets.where('jobId').equals(first.id).first()).toMatchObject({ mimeType: 'audio/wav' })
+    await vi.waitFor(async () => {
+      expect(await db.mediaAssets.where('jobId').equals(first.id).first()).toMatchObject({ mimeType: 'audio/wav' })
+    })
   })
 
   it('submits Kling avatar and Whisper caption jobs with recoverable parent links', async () => {
