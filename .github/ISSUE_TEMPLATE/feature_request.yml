@@ -1,0 +1,30 @@
+name: Feature proposal
+description: Suggest a focused improvement for learners or contributors
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What learner or contributor problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the behavior and how someone would know it works.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Source, privacy, and cost considerations
+      description: Note any new source licensing, stored data, provider traffic, or paid calls.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider?
